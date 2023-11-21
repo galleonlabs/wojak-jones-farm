@@ -7,7 +7,33 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-const farmData = [{}];
+const farmData = [
+  {
+    farmName: "[Protocol] [requiredAssets] [Action]",
+    farmLink: "https://blockcropfarm.com",
+    requiredAssets: [
+      {
+        name: "",
+        ticker: "",
+        coinGeckoUrl: "",
+      },
+      {
+        name: "",
+        ticker: "",
+        coinGeckoUrl: "",
+      },
+    ],
+    rewardAssets: [
+      {
+        name: "",
+        ticker: "",
+        coinGeckoUrl: "",
+      },
+    ],
+    riskScore: 5,
+    notes: "We like the coins",
+  },
+];
 
 const batch = db.batch();
 
