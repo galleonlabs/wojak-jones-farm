@@ -72,7 +72,6 @@ const Farmyard = () => {
       setFarms(fetchedFarms);
     };
 
-
     const fetchData = async () => {
       const verified = await verifyUser();
       console.log(verified);
@@ -114,7 +113,7 @@ const Farmyard = () => {
                       {farm.network}
                     </span>
                   </p>
-                  <p>Rewards: {farm.rewardAssets.map(asset => <a href={asset.coinGeckoUrl} className="hover:bg-theme-3 inline-flex mx-0.5 flex-shrink-0 items-center rounded-sm  px-1  text-sm text-gray-900 border border-theme-5">
+                  <p>Rewards: {farm.rewardAssets.map((asset, index) => <a href={asset.coinGeckoUrl} key={index} className="hover:bg-theme-3 inline-flex mx-0.5 flex-shrink-0 items-center rounded-sm  px-1  text-sm text-gray-900 border border-theme-5">
                     {asset.ticker}
                   </a>)}</p>
                   <p>
