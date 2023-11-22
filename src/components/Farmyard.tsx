@@ -92,15 +92,15 @@ const Farmyard = () => {
 
   return (
     <>
-      <div className="bg-theme-4 rounded-sm max-w-4xl py-8">
+      <div className="bg-theme-4 border-2 border-theme-5  rounded-sm max-w-4xl py-8 tracking-wider bg-[url('Frame.png')] bg-contain bg-repeat bg-top">
         <h1 className="text-3xl font-bold text-theme-pan-navy mb-4 text-center ">The Farmyard</h1>
         <ul role="list" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 mx-8">
           {verified && hasPaid && farms.map((farm: Farm, index: number) => (
-            <li key={index} className="col-span-1 divide-y divide-theme-5 rounded-sm bg-theme-4 border border-theme-5 shadow shadow-theme-5">
+            <li key={index} className="col-span-1 divide divide-theme-5 rounded-sm bg-theme-4 border-2 border-theme-5 shadow shadow-theme-5 ">
               <div className="flex w-full items-center justify-between space-x-6 p-4">
                 <div className="flex-1">
 
-                  <h3 className="text-md font-semibold truncate text-gray-900 pb-2">{farm.farmName}</h3>
+                  <h3 className="text-md font-semibold truncate  text-gray-900 pb-1 mb-2 border-b border-theme-5">{farm.farmName}</h3>
 
                   <p>
                     Risk:&nbsp;
@@ -114,7 +114,7 @@ const Farmyard = () => {
                       {farm.network}
                     </span>
                   </p>
-                  <p>Rewards: {farm.rewardAssets.map(asset => <a href={asset.coinGeckoUrl} className="hover:bg-theme-1 inline-flex mx-0.5 flex-shrink-0 items-center rounded-sm  px-1  text-sm text-gray-900 border border-theme-5">
+                  <p>Rewards: {farm.rewardAssets.map(asset => <a href={asset.coinGeckoUrl} className="hover:bg-theme-3 inline-flex mx-0.5 flex-shrink-0 items-center rounded-sm  px-1  text-sm text-gray-900 border border-theme-5">
                     {asset.ticker}
                   </a>)}</p>
                   <p>
@@ -126,7 +126,7 @@ const Farmyard = () => {
                 </div>
               </div>
               <div>
-                <div className="-mt-px flex divide-x divide-theme-5 bg-theme-1">
+                <div className="-mt-px flex divide-x divide-theme-5 bg-theme-1 hover:bg-theme-3">
                   <div className="flex w-0 flex-1">
                     <a
                       href={farm.farmLink}
