@@ -114,6 +114,10 @@ function App(): JSX.Element {
               </button>
             )}
 
+            <a href='https://t.me/+RhoECTs_tRFjNzhk' target='_blank' onClick={() => setOpen(true)} className="border-2 ml-3 border-gray-600 text-2xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
+              Telegram
+            </a>
+
           </div>
           <Transition.Root show={open} as={Fragment}>
             <Dialog as="div" className="relative z-10" onClose={setOpen}>
