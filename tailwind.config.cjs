@@ -8,7 +8,7 @@ module.exports = {
         farmers: ["FarmerStandard", "Inter var"],
         farmerr: ["FarmerRounded", "Inter var"],
         farmerv: ["FarmerVintage", "Inter var"],
-        sans: ["Inter", ...defaultTheme.fontFamily.sans],
+        inter: ["Inter", ...defaultTheme.fontFamily.sans],
       },
       colors: {
         "theme-1": "#ffc99b",

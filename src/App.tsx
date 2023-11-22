@@ -2,15 +2,18 @@ import { useEffect, useState } from 'react';
 import './App.css'
 import ConnectButton from './components/ConnectButton'
 import Farmyard from './components/Farmyard'
-import { useEthers, useSendTransaction } from '@usedapp/core';
+import { Arbitrum, Mainnet, Optimism, Polygon, useEthers, useSendTransaction } from '@usedapp/core';
 import { DocumentData, doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from './main';
 import { ethers } from 'ethers';
+import { Fragment } from 'react'
+import { Dialog, Transition } from '@headlessui/react'
 
 function App() {
-  const { account } = useEthers();
+  const { account, chainId } = useEthers();
   const [harvest, setHarvest] = useState<DocumentData | null>(null)
   const { sendTransaction, state } = useSendTransaction();
+  const [open, setOpen] = useState(false)
 
   useEffect(() => {
     if (!account) return;
@@ -21,7 +24,7 @@ function App() {
 
       if (configDoc.exists()) {
         setHarvest(configDoc.data())
-      } 
+      }
     }
 
     fetchConfig()
@@ -30,74 +33,137 @@ function App() {
   useEffect(() => {
     if (!account) return;
     if (state.status === 'Success') {
-      const accountRef = doc(db, "accounts", account );
+      const accountRef = doc(db, "accounts", account);
       updateDoc(accountRef, { paid: true, transactionHash: state.transaction?.hash });
     }
   }, [state, account]);
-  
-  const handleDonate = () => {
+
+  const handleDonate = (amount: string) => {
     if (!account) return;
-    sendTransaction({ to: '0xF532A30A48bC18b4074C6930F335e5dB107CE555', value: ethers.utils.parseEther('0.05') });
+    sendTransaction({ to: '0xa2f9e57Bd805AbBee9fC5A78FB53aEE9F89257b4', value: ethers.utils.parseEther(amount) });
   };
+
+  const getBlockExplorerUrl = (txHash: string = '', chainId: number = 1): string => {
+    switch (chainId) {
+      case Optimism.chainId:
+        return Optimism.getExplorerTransactionLink(txHash);
+      case Polygon.chainId:
+        return Polygon.getExplorerTransactionLink(txHash);
+      case Arbitrum.chainId:
+        return Arbitrum.getExplorerTransactionLink(txHash);
+      default:
+        return Mainnet.getExplorerTransactionLink(txHash);
+    }
+  }
 
   const renderTransactionState = () => {
     switch (state.status) {
       case 'None':
         return <div></div>; // No transaction initiated
       case 'PendingSignature':
-        return <div className="text-orange-500">Awaiting Signature...</div>;
+        return <div className="animate animate-pulse text-2xl text-center py-2">Awaiting Signature...</div>;
       case 'Mining':
-        return <div className="text-blue-500">Transaction is being processed...</div>;
+        return <div className="animate animate-pulse text-2xl text-center">Transactions being processed, partner. <a href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>Explorer</a></div>;
       case 'Success':
-        return <div className="text-green-500">Transaction Successful!</div>;
+        return <div className="text-2xl text-center">Well look at that, transaction successful!</div>;
       case 'Fail':
-        return <div className="text-red-500">Transaction Failed</div>;
+        return <div className="text-2xl text-center">Ah sorry, partner - the transaction failed</div>;
       default:
         return <div></div>;
     }
   };
 
   return (
-    <div className='mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 min-h-full pb-32 '>
+    <div className='mx-auto max-w-4xl  min-h-full mb-32 text-gray-900 border-2 border-gray-600 rounded-sm mt-16 justify-center '>
       <>
-        <div className="bg-theme-4 border-2 border-theme-5  rounded-sm max-w-4xl py-4  mt-8">  
-          <h1 className="text-3xl font-bold text-theme-pan-navy mb-2 pt-4 text-center ">Front Gate</h1>
-          <p className='text-lg text-theme-pan-navy text-center'>Welcome {account && 'back'} to Blockcrop Farm, partner.</p>
-          {!account && <p className='text-lg text-theme-pan-navy text-center pb-2'>Connect your wallet to view our crops.</p>}
-          {account && harvest && <p className='text-lg text-theme-pan-navy text-center pb-2'>We're currently on harvest {harvest?.harvest}, and if you care to stay we will be sending the combine harvester out on {harvest?.nextHarvest.toDate().toDateString()}</p>}
+        <div className="bg-theme-4 border-2 border-theme-5 justify-center mx-auto  rounded-sm max-w-4xl py-4  pt-8">
+          <img src='./field.png'alt='logo'className='h-16 w-16 justify-center text-center mx-auto'></img>
+          <h1 className="text-5xl font-bold mb-2 pt-4 text-center ">Front Gate</h1>
+          <p className='text-2xl text-center'>Welcome {account && 'back'} to Blockcrop Farm, partner.</p>
+          {!account && <p className='text-2xl text-center pb-2'>Connect your wallet to view our crops.</p>}
+          {account && harvest && <p className='text-2xl text-center pb-2'>We're currently on harvest {harvest?.harvest}, and if you care to stay<br></br> we will be sending the combine harvester out on {harvest?.nextHarvest.toDate().toDateString()}</p>}
+          <div className='justify-center mx-auto text-center'>
           <ConnectButton />
           {account && (
-            <button onClick={handleDonate} className="bg-blue-500 text-white font-bold py-2 px-4 rounded">
-              Donate 0.05 ETH
+            <button onClick={() => setOpen(true)} className="border-2 ml-3 border-gray-600 text-2xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
+              Donate
             </button>
-          )}
-          {renderTransactionState()}
+            )}
+            
+          </div>
+          <Transition.Root show={open} as={Fragment}>
+            <Dialog as="div" className="relative z-10" onClose={setOpen}>
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <div className="fixed inset-0  transition-opacity" />
+              </Transition.Child>
+
+              <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                  <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    enterTo="opacity-100 translate-y-0 sm:scale-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                    leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                  >
+                    <Dialog.Panel className="relative transform overflow-hidden rounded-sm bg-theme-4 px-4 pb-4 pt-5 text-left shadow-xl border-2 border-gray-600 transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
+                      <div>
+
+                        <div className=" text-center ">
+                          <Dialog.Title as="h3" className="text-5xl font-farmerr  font-semibold  text-gray-900">
+                            How much you donating, partner?
+                          </Dialog.Title>
+                          <div className="mt-4 text-center">
+                            <p className='text-2xl font-farmerr'>Your one-time donation makes you a permanent friend of the farm and you'll always be able to see our crops. Your access will update automatically on transaction confirmation.</p>
+                            <p className="">
+                  
+                              {renderTransactionState()}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                  
+                      <div className="mt-5 sm:mt-6 grid grid-cols-3 font-farmerr">
+                        <button onClick={() => handleDonate('0.01')} className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
+                          0.01 ETH
+                        </button>
+                        <button onClick={() => handleDonate('0.05')} className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
+                          0.05 ETH
+                        </button>
+                        <button onClick={() => handleDonate('0.10')} className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
+                          0.10 ETH
+                        </button>
+                      </div>
+                     
+                      <div className="mt-5 sm:mt-6 grid grid-cols-3 font-farmerr">
+                        <div></div>
+                        <button onClick={() => setOpen(false)} className="border-2  border-gray-600 text-3xl w-full px-2 rounded-sm bg-theme-1 hover:bg-theme-3 justify-center text-center inline-flex mx-auto">
+                          Close
+                        </button>
+                        <div></div>
+                      </div>
+                     
+                      
+                    </Dialog.Panel>
+                  </Transition.Child>
+                </div>
+              </div>
+            </Dialog>
+          </Transition.Root>
+
         </div>
       </>
-      <div className='text-xs text-theme-4 hidden md:block'>
-        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▒▒░░░░▒▒▒▒░░░░░░░░░░░░
-        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▒▒░░▒▒▒▒░░▒▒▓▓░░░░░░░░░░
-        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▒▒░░░░░░▒▒░░░░░░░░░░░░▒▒▓▓░░░░░░░░
-        ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▒▒▒▒▒▒░░▒▒▒▒▓▓▒▒▒▒▒▒▓▓▓▓░░░░░░
-        ▓▓▓▓▓▓▓▓░░▒▒░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▒▒░░▒▒▒▒▒▒▓▓▒▒▓▓██▓▓▓▓▒▒▒▒▓▓██░░░░░░
-        ▓▓▓▓▓▓██▓▓▓▓▒▒░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▒▒▒▒▒▒▒▒▓▓▓▓▓▓▓▓░░▓▓▓▓▓▓▓▓▓▓▒▒░░░░░░
-        ▓▓▒▒▓▓▓▓██▓▓▓▓▒▒▒▒██▓▓▒▒░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▒▒░░░░░░▓▓░░░░▓▓░░▓▓░░▒▒░░░░░░░░
-        ██▓▓▓▓▓▓██████▓▓▒▒▒▒▒▒▓▓▓▓██▓▓▒▒░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▒▒░░░░░░░░░░░░░░░░
-        ▓▓██▓▓▓▓▓▓████▓▓██▓▓▒▒▒▒▓▓██████▒▒▒▒░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░▓▓░░░░░░░░░░░░▓▓░░░░░░░░░░░░░░░░
-        ▓▓▓▓██▓▓▓▓▒▒▓▓▓▓████▓▓▒▒▒▒▒▒▓▓████▒▒▒▒░░░░▒▒▒▒▒▒▒▒▒▒░░░░░░░░░░░░░░░░██░░░░░░░░░░░░▓▓░░░░░░░░░░░░░░░░
-        ▓▓▓▓▓▓▓▓██▓▓▓▓▒▒▓▓▓▓▓▓██▓▓▒▒▒▒██████▓▓▒▒▒▒░░▓▓▓▓▒▒▒▒░░▒▒░░░░░░░░░░░░░░░░░░░░░░░░░░▓▓░░░░░░░░░░░░░░░░
-        ▒▒▒▒▓▓▓▓▓▓██▓▓▓▓▒▒▓▓▓▓████▓▓▒▒▒▒████████▓▓▒▒▒▒░░████▒▒░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-        ▓▓▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓██▓▓▒▒▒▒▓▓▓▓▓▓▓▓▓▓▒▒▒▒░░▓▓██▒▒░░░░░░░░░░▒▒░░░░░░░░░░░░░░░░░░░░░░▒▒▒▒▒▒▒▒░░
-        ▓▓▒▒▓▓▒▒▒▒▓▓▓▓▓▓██▓▓▓▓▓▓▓▓▓▓▓▓██▓▓▒▒▓▓▓▓▓▓▓▓██▒▒▒▒░░▒▒▓▓████▒▒░░░░░░▒▒░░▒▒░░░░░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒░░
-        ▓▓▓▓▓▓▓▓▓▓▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▒▒░░░░▒▒▓▓▓▓██▒▒░░░░░░░░░░░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░
-        ▒▒▒▒▒▒▓▓▓▓▒▒▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▓▓▓▓▓▓▓▓▒▒▒▒░░░░▓▓▓▓▓▓▓▓░░░░░░░░░░░░░░░░▒▒▒▒▒▒░░░░░░░░░░
-        ▒▒▒▒▒▒▒▒▓▓▓▓▓▓▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▓▓▓▓▓▓▓▓▓▓▒▒▒▒░░▓▓▓▓▓▓▓▓░░░░░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░
-        ▒▒▒▒▒▒▒▒▒▒▒▒██▓▓▒▒▓▓▓▓▓▓██▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▒▒▓▓▓▓▓▓▓▓▓▓░░░░▒▒▓▓▓▓▓▓▓▓░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒░░░░░░
-        ▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓▓▓▒▒▒▒▓▓▓▓▓▓▓▓▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▒▒▓▓▓▓▓▓▓▓▓▓▒▒░░░░▒▒▒▒▓▓▓▓░░░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒░░░░
-        ██▓▓▒▒▒▒▒▒▒▒▒▒▓▓██▓▓▒▒▒▒▓▓▒▒██▓▓▓▓▓▓▒▒▓▓▓▓▓▓▓▓▓▓▓▓▒▒▓▓▓▓▓▓▓▓▓▓▒▒▒▒░░░░▒▒▒▒▓▓▓▓░░░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒░░
-        ▒▒▓▓▒▒▒▒▒▒▒▒▒▒▒▒▒▒▓▓▓▓▒▒▒▒▒▒▒▒▓▓██▓▓▒▒▓▓▓▓▓▓▓▓▓▓▓▓▓▓▒▒▓▓▒▒▓▓▓▓▒▒██▒▒▒▒░░▒▒▒▒▒▒▓▓░░░░░░▒▒▒▒▒▒▒▒▒▒▒▒▒▒
-      </div>
+
       <Farmyard></Farmyard>
     </div>
   )
