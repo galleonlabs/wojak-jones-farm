@@ -1,5 +1,6 @@
 const admin = require("firebase-admin");
 const serviceAccount = require("./key.json");
+const { Arbitrum, Optimism } = require("@usedapp/core");
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
@@ -7,38 +8,31 @@ admin.initializeApp({
 
 const db = admin.firestore();
 
-const farmData = [
-  {
-    farmName: "[Protocol] [requiredAssets] [Action]",
-    farmLink: "https://blockcropfarm.com",
-    requiredAssets: [
-      {
-        name: "",
-        ticker: "",
-        coinGeckoUrl: "",
-      },
-      {
-        name: "",
-        ticker: "",
-        coinGeckoUrl: "",
-      },
-    ],
-    rewardAssets: [
-      {
-        name: "",
-        ticker: "",
-        coinGeckoUrl: "",
-      },
-    ],
-    riskScore: 5,
-    notes: "We like the coins",
-  },
-];
+const VOLATILE = "VOLATILE";
+const STABLE = "STABLE";
+const STAKING = "STAKING";
+
+// {
+//     farmName: "[Protocol] [requiredAssets] [Action]",
+//     farmLink: "https://blockcropfarm.com",
+//     rewardAssets: [
+//       {
+//         name: "",
+//         ticker: "",
+//         coinGeckoUrl: "",
+//       },
+//     ],
+//     riskScore: 5,
+//     type: VOLATILE,
+//     network: ''
+//   },
+
+const farmData = [];
 
 const batch = db.batch();
 
 farmData.forEach((farm) => {
-  const farmRef = db.collection("farms").doc();
+  const farmRef = db.collection("activeFarms").doc();
   batch.set(farmRef, farm);
 });
 

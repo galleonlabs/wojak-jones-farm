@@ -1,0 +1,20 @@
+@font-face {
+  font-family: "FarmerStandard";
+  src: url("font/standard.otf");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "FarmerRounded";
+  src: url("font/rounded.otf");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "FarmerVintage";
+  src: url("font/vintage.otf");
+  font-weight: normal;
+  font-style: normal;
+}
