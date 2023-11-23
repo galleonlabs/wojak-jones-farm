@@ -27,6 +27,7 @@ const Farmyard = ({ donationState, harvest }: FarmyardProps) => {
   const { account } = useEthers();
   const [farms, setFarms] = useState<Farm[]>([]);
   const [hasPaid, setHasPaid] = useState<boolean>(false);
+  const [selectedFilter, setSelectedFilter] = useState<string>('All Farms');
 
   useEffect(() => {
     if (!account) return;
@@ -63,15 +64,37 @@ const Farmyard = ({ donationState, harvest }: FarmyardProps) => {
     fetchData();
   }, [account, donationState]);
 
+  const handleFilterChange = (filter: string) => {
+    setSelectedFilter(filter);
+  };
+
+  const filteredFarms = farms.filter(farm => {
+    return selectedFilter === 'All Farms' || farm.type === selectedFilter.toUpperCase();
+  });
+
   return (
     <>
       <div className="mx-auto bg-theme-4 border-2 border-theme-5  rounded-sm max-w-4xl py-8 tracking-wider bg-[url('Frame.png')] bg-contain bg-repeat bg-top">
         <img src='./farm.png' alt='logo' className='h-16 w-16 justify-center text-center mx-auto'></img>
         <h1 className="text-5xl font-bold text-theme-pan-navy mb-2 text-center pt-4">Crop Fields</h1>
         {account && harvest && <p className='text-2xl text-center pb-2'>{harvest?.season} Harvest</p>}
-        {account && !hasPaid && <div className="text-2xl text-center mx-auto border-gray-900 bg-theme-3 py-4 border-y mb-2 mt-4">Consider a one-time donation to the farmstead to see more than two crops, friend.</div>}
+        {account && !hasPaid && <div className="text-2xl text-center mx-auto border-gray-900 bg-theme-3 py-4 border-y mb-2">Consider a one-time donation to the farmstead to see more than two crops, friend.</div>}
+
+  
+        {account && hasPaid && <div className="text-center mb-2">
+          {['All Farms', 'Stable', 'Volatile', 'Staking', 'Airdrop'].map(filter => (
+            <button
+              key={filter}
+              onClick={() => handleFilterChange(filter)}
+              className={`mx-2 px-2 text-2xl border-2 border-gray-600 rounded-sm ${selectedFilter === filter ? 'bg-theme-3' : 'bg-theme-1'}`}
+            >
+              {filter}
+            </button>
+          ))}
+        </div>}
+        
         <ul role="list" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 mx-8 pt-4">
-          {account && farms.map((farm: Farm, index: number) => (
+          {account && filteredFarms.map((farm: Farm, index: number) => (
             <li key={index} className="col-span-1 divide divide-theme-5 rounded-sm bg-theme-4 border-2 border-theme-5 shadow shadow-theme-5 ">
               <div className="flex w-full items-center justify-between space-x-6 p-4">
                 <div className="flex-1 text-xl">
