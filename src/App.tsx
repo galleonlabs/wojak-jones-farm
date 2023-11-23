@@ -84,15 +84,15 @@ function App(): JSX.Element {
       case 'None':
         return <div className="font-farmerr text-2xl text-center"></div>
       case 'PendingSignature':
-        return <div className="font-farmerr  animate animate-pulse text-2xl text-center py-2">Awaiting Signature...</div>;
+        return <div className="font-farmerr  animate animate-pulse text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Awaiting Signature...</div>;
       case 'Mining':
-        return <div className="font-farmerr  animate animate-pulse text-2xl text-center">Transaction being processed.<br></br><a target='_blank' href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>View Explorer</a></div>;
+        return <div className="font-farmerr  animate animate-pulse text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Transaction being processed.<br></br><a target='_blank' href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>View Explorer</a></div>;
       case 'Success':
-        return <div className="font-farmerr  text-2xl text-center">Well look at that, transaction successful!<br></br><a target='_blank' href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>View Explorer</a></div>;
+        return <div className="font-farmerr  text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Well look at that, transaction successful!<br></br><a target='_blank' href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>View Explorer</a></div>;
       case 'Fail':
-        return <div className="font-farmerr  text-2xl text-center">Ah sorry, partner - the transaction failed.<br></br><a target='_blank' href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>View Explorer</a></div>;
+        return <div className="font-farmerr  text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Ah sorry, partner - the transaction failed.<br></br><a target='_blank' href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>View Explorer</a></div>;
       default:
-        return <div className="font-farmerr  text-2xl text-center"></div>;
+        return <div className="font-farmerr   text-2xl text-center"></div>;
     }
   };
 
@@ -153,14 +153,14 @@ function App(): JSX.Element {
                           </Dialog.Title>
                           <div className="mt-4 text-center">
                             <p className='text-2xl font-farmerr'>Your one-time donation makes you a permanent friend of the farm and you'll always be able to see our crops. Your access will update automatically on transaction confirmation.</p>
-                            {account && state.transaction && <p className="py-2 my-2 border-y border-gray-600 bg-theme-3">
+                            {account && state.status && <span >
                               {renderTransactionState()}
-                            </p>}
+                            </span>}
                           </div>
                         </div>
                       </div>
 
-                      <div className="mt-5 sm:mt-6 grid grid-cols-3 font-farmerr">
+                      <div className="mt-4 sm:mt-6 grid grid-cols-3 font-farmerr">
                         <button onClick={() => handleDonate('0.01')} className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
                           0.01 ETH
                         </button>
@@ -172,7 +172,7 @@ function App(): JSX.Element {
                         </button>
                       </div>
 
-                      <div className="mt-5 sm:mt-6 grid grid-cols-3 font-farmerr">
+                      <div className="mt-4 sm:mt-4 grid grid-cols-3 font-farmerr">
                         <div></div>
                         <button onClick={() => {
                           setOpen(false)
