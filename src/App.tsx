@@ -100,10 +100,10 @@ function App(): JSX.Element {
     <div className='mx-auto max-w-4xl  min-h-full mb-32 text-gray-900 border-2 border-gray-600 rounded-sm mt-16 justify-center '>
       <>
         <div className="bg-theme-4 border-2 border-theme-5 justify-center mx-auto pb-6  rounded-sm max-w-4xl py-4  pt-8">
-          <h1 className="text-7xl font-bold mb-2 pt-4 text-center ">Blockcrop Farm</h1>
+          <h1 className="text-7xl font-bold mb-2 pt-4 text-center ">Wojak Jones Farm</h1>
           <img src='./field.png' alt='logo' className='h-16 w-16 justify-center text-center mx-auto'></img>
           <h1 className="text-5xl font-bold mb-2 pt-4 text-center ">Front Gate</h1>
-          <p className='text-2xl text-center'>Welcome {account && 'back'} to Blockcrop Farm, partner.</p>
+          <p className='text-2xl text-center'>Welcome {account && 'back'} to Wojak Jones Farm, partner.</p>
           {!account && <p className='text-2xl text-center pb-2'>Connect your wallet to view our crops.</p>}
           {account && harvest && <p className='text-2xl text-center pb-2'>We're currently on harvest {harvest?.harvest}, and if you care to stay<br></br> we will be sending the combine harvester out on {harvest?.nextHarvest.toDate().toDateString()}</p>}
           <div className='justify-center mx-auto text-center'>

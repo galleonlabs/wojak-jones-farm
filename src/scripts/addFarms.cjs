@@ -14,7 +14,7 @@ const STAKING = "STAKING";
 
 // {
 //     farmName: "[Protocol] [requiredAssets] [Action]",
-//     farmLink: "https://blockcropfarm.com",
+//     farmLink: "https://wojakjonesfarm.com",
 //     rewardAssets: [
 //       {
 //         name: "",
