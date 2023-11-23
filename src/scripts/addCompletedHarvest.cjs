@@ -17,6 +17,7 @@ const db = admin.firestore();
 //     harvest: 1,
 //     season: WINTER,
 //     score: 3,
+//     summary: '',
 //     rewardAssets: [
 //       {
 //         name: "Arbitrum",
