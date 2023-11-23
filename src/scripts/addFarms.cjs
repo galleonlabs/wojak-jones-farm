@@ -11,6 +11,7 @@ const db = admin.firestore();
 const VOLATILE = "VOLATILE";
 const STABLE = "STABLE";
 const STAKING = "STAKING";
+const AIRDROP = "AIRDROP";
 
 // {
 //     farmName: "[Protocol] [requiredAssets] [Action]",
