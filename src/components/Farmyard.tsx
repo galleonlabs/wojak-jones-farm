@@ -1,6 +1,6 @@
-import { TransactionStatus, useEthers, useTokenBalance } from "@usedapp/core";
+import {  useEthers, useTokenBalance } from "@usedapp/core";
 import { useEffect, useState } from "react";
-import { DocumentData, collection, doc, getDoc, getDocs, limit, query } from "firebase/firestore";
+import { DocumentData, collection, getDocs, limit, query } from "firebase/firestore";
 import { db } from "../main";
 import { BigNumber } from "ethers";
 import { formatUnits } from "ethers/lib/utils";
@@ -42,10 +42,10 @@ const Farmyard = ({ harvest }: FarmyardProps) => {
   const { account } = useEthers();
   const [farms, setFarms] = useState<Farm[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string>('All Farms');
-  const balance = useTokenBalance("0x37fD2243004Ea585E5dA47318b1A1f2F5f12BcF9", account, { chainId: 1 })
+  const balance = useTokenBalance("0x62012018d70A7389F329aBc2FE776c4a70E433Af", account, { chainId: 1 })
 
   const grainBalance = balance && displayFromWei(balance, 2, 18) || "0";
-  const enoughGrain = parseFloat(grainBalance) >= 100000
+  const enoughCrops = harvest && parseFloat(grainBalance) >= harvest.minimumCrops
 
   useEffect(() => {
     if (!account) return;
@@ -61,11 +61,11 @@ const Farmyard = ({ harvest }: FarmyardProps) => {
     };
 
     const fetchData = async () => {
-      fetchActiveFarms(enoughGrain ? 100 : 2);
+      fetchActiveFarms(enoughCrops ? 100 : 2);
     };
 
     fetchData();
-  }, [account, enoughGrain]);
+  }, [account, enoughCrops]);
 
   const handleFilterChange = (filter: string) => {
     setSelectedFilter(filter);
@@ -82,10 +82,10 @@ const Farmyard = ({ harvest }: FarmyardProps) => {
         <img src='./farm.png' alt='logo' className='h-16 w-16 justify-center text-center mx-auto'></img>
         <h1 className="text-5xl font-bold text-theme-pan-navy mb-2 text-center pt-4">Crop Fields</h1>
         {account && harvest && <p className='text-2xl text-center pb-2'>{harvest?.season} Harvest</p>}
-        {account && !enoughGrain && <div className="text-2xl text-center mx-auto border-gray-900 bg-theme-3 py-4 border-y mb-2">Labourers with 100,000 GRAIN in their baskets can see more crops.</div>}
+        {account && !enoughCrops && <div className="text-2xl text-center mx-auto border-gray-900 bg-theme-3 py-4 border-y mb-2">Labourers with at least 10,000 $CROPS get access to the full farmyard.</div>}
         
 
-        {account && enoughGrain && <div className="text-center mb-2">
+        {account && enoughCrops && <div className="text-center mb-2">
           {['All Farms', 'Stable', 'Volatile', 'Staking', 'Airdrop'].map(filter => (
             <button
               key={filter}
@@ -141,7 +141,7 @@ const Farmyard = ({ harvest }: FarmyardProps) => {
               </div>
             </li>
           ))}
-          {(!enoughGrain || !account) && <>
+          {(!enoughCrops || !account) && <>
             {[<></>, <></>, <></>, <></>].fill(<div className=" blur col-span-1 divide divide-theme-5 rounded-sm bg-theme-4 border-2 border-theme-5 shadow shadow-theme-5 ">
               <div className="flex w-full items-center justify-between space-x-6 p-4">
                 <div className="flex-1 text-xl">

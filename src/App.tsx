@@ -2,24 +2,25 @@ import { useEffect, useState } from 'react';
 import './App.css'
 import ConnectButton from './components/ConnectButton'
 import Farmyard from './components/Farmyard'
-import { Arbitrum, Mainnet, Optimism, Polygon, useEthers, useSendTransaction } from '@usedapp/core';
+import { Optimism, Arbitrum, Polygon, useEthers, useSendTransaction, Mainnet } from '@usedapp/core';
 import { DocumentData, doc, getDoc, setDoc } from 'firebase/firestore';
 import { db } from './main';
-import { ethers } from 'ethers';
 import { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
-import { ALLOWED_NETWORKS, BLOCKCROP_FARM_ADDRESS } from './constants';
+import { ALLOWED_NETWORKS, WOJAK_JONES_FARM_ADDRESS } from './constants';
+import { ethers } from 'ethers';
 
 function App(): JSX.Element {
-  const { account, chainId, library } = useEthers();
+  const { account, library, chainId } = useEthers();
   const [harvest, setHarvest] = useState<DocumentData | null>(null);
-  const { sendTransaction, state } = useSendTransaction();
+  const { state, sendTransaction } = useSendTransaction();
   const [open, setOpen] = useState<boolean>(false);
+  const [openTip, setOpenTip] = useState<boolean>(false);
 
   useEffect(() => {
     if (!account) return;
     fetchConfig();
-    // checkPendingTransaction();
+     checkPendingTransaction();
   }, [account, library]);
 
   const fetchConfig = async () => {
@@ -30,71 +31,71 @@ function App(): JSX.Element {
     }
   };
 
-  // const checkPendingTransaction = () => {
-  //   const storedTxHash = localStorage.getItem('pendingTransactionHash');
-  //   if (!storedTxHash || !library) return;
+  const checkPendingTransaction = () => {
+    const storedTxHash = localStorage.getItem('pendingTransactionHash');
+    if (!storedTxHash || !library) return;
 
-  //   library.getTransactionReceipt(storedTxHash).then(receipt => {
-  //     if (receipt && receipt.confirmations) {
-  //       updateAccountPaidStatus(storedTxHash);
-  //     }
-  //     localStorage.removeItem('pendingTransactionHash');
-  //   });
-  // };
+    library.getTransactionReceipt(storedTxHash).then(receipt => {
+      if (receipt && receipt.confirmations) {
+        updateAccountPaidStatus(storedTxHash);
+      }
+      localStorage.removeItem('pendingTransactionHash');
+    });
+  };
 
   useEffect(() => {
-    // if (account && state.status === 'Success') {
-    //   updateAccountPaidStatus(state.transaction?.hash);
-    // }
+    if (account && state.status === 'Success') {
+      updateAccountPaidStatus(state.transaction?.hash);
+    }
   }, [state, account]);
 
-  // const updateAccountPaidStatus = (transactionHash?: string) => {
-  //   if (!transactionHash || !account) return
-  //   const accountRef = doc(db, "accounts", account.toLowerCase());
-  //   setDoc(accountRef, { account: account.toLowerCase(), paid: true, transactionHash }, { merge: true });
-  // };
+  const updateAccountPaidStatus = (transactionHash?: string) => {
+    if (!transactionHash || !account) return
+    const accountRef = doc(db, "accounts", account.toLowerCase());
+    setDoc(accountRef, { account: account.toLowerCase(), tipped: true, transactionHash }, { merge: true });
+  };
 
-  // const isAllowedNetwork = () => ALLOWED_NETWORKS.includes(chainId || 1);
+  const isAllowedNetwork = () => ALLOWED_NETWORKS.includes(chainId || 1);
 
-  // const handleDonate = (amount: string) => {
-  //   if (!account || !isAllowedNetwork()) return;
+  const handleDonate = (amount: string) => {
+    if (!account || !isAllowedNetwork()) return;
 
-  //   sendTransaction({ to: BLOCKCROP_FARM_ADDRESS, value: ethers.utils.parseEther(amount) })
-  //     .then((txResponse) => {
-  //       localStorage.setItem('pendingTransactionHash', txResponse?.transactionHash || '');
-  //     })
-  //     .catch(console.error);
-  // };
+    sendTransaction({ to: WOJAK_JONES_FARM_ADDRESS, value: ethers.utils.parseEther(amount) })
+      .then((txResponse) => {
+        localStorage.setItem('pendingTransactionHash', txResponse?.transactionHash || '');
+      })
+      .catch(console.error);
+  };
 
-  // const getBlockExplorerUrl = (txHash: string = '', chainId: number = 1): string => {
-  //   switch (chainId) {
-  //     case Optimism.chainId:
-  //       return Optimism.getExplorerTransactionLink(txHash);
-  //     case Polygon.chainId:
-  //       return Polygon.getExplorerTransactionLink(txHash);
-  //     case Arbitrum.chainId:
-  //       return Arbitrum.getExplorerTransactionLink(txHash);
-  //     default:
-  //       return Mainnet.getExplorerTransactionLink(txHash);
-  //   }
-  // }
+  const getBlockExplorerUrl = (txHash: string = '', chainId: number = 1): string => {
+    switch (chainId) {
+      case Optimism.chainId:
+        return Optimism.getExplorerTransactionLink(txHash);
+      case Polygon.chainId:
+        return Polygon.getExplorerTransactionLink(txHash);
+      case Arbitrum.chainId:
+        return Arbitrum.getExplorerTransactionLink(txHash);
+      default:
+        return Mainnet.getExplorerTransactionLink(txHash);
+    }
+  }
 
-  // const renderTransactionState = () => {
-  //   switch (state.status) {
-  //     case 'None':
-  //       return <div className="font-farmerr text-2xl text-center"></div>
-  //     case 'PendingSignature':
-  //       return <div className="font-farmerr  animate animate-pulse text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Awaiting Signature...</div>;
-  //     case 'Mining':
-  //       return <div className="font-farmerr  animate animate-pulse text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Transaction being processed.<br></br><a target='_blank' href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>View Explorer</a></div>;
-  //     case 'Success':
-  //       return <div className="font-farmerr  text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Well look at that, transaction successful!<br></br><a target='_blank' href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>View Explorer</a></div>;
-  //     case 'Fail':
-  //       return <div className="font-farmerr  text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Ah sorry, partner - the transaction failed.<br></br><a target='_blank' href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>View Explorer</a></div>;
-  //     default:
-  //       return <div className="font-farmerr   text-2xl text-center"></div>;
-  //   }
-  // };
+  const renderTransactionState = () => {
+    switch (state.status) {
+      case 'None':
+        return <div className="font-farmerr text-2xl text-center"></div>
+      case 'PendingSignature':
+        return <div className="font-farmerr  animate animate-pulse text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Awaiting Signature...</div>;
+      case 'Mining':
+        return <div className="font-farmerr  animate animate-pulse text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Transaction being processed.<br></br><a target='_blank' href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>View Explorer</a></div>;
+      case 'Success':
+        return <div className="font-farmerr  text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Well look at that, transaction successful!<br></br><a target='_blank' href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>View Explorer</a></div>;
+      case 'Fail':
+        return <div className="font-farmerr  text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Ah sorry, partner - the transaction failed.<br></br><a target='_blank' href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>View Explorer</a></div>;
+      default:
+        return <div className="font-farmerr   text-2xl text-center"></div>;
+    }
+  };
 
   return (
     <div className='mx-auto max-w-4xl  min-h-full mb-32 text-gray-900 border-2 border-gray-600 rounded-sm mt-16 justify-center '>
@@ -110,14 +111,16 @@ function App(): JSX.Element {
             <ConnectButton />
 
             <button onClick={() => setOpen(true)} className="border-2 ml-3 border-gray-600 text-2xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
-              GRAIN
+              $CROPS
             </button>
 
 
-            <a href='https://t.me/+RhoECTs_tRFjNzhk' target='_blank' onClick={() => setOpen(true)} className="border-2 ml-3 border-gray-600 text-2xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
+            <a href='https://t.me/+aXlXXyqTFEViNDU0' target='_blank' onClick={() => setOpen(true)} className="border-2 ml-3 border-gray-600 text-2xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
               Telegram
             </a>
-
+            <button onClick={() => setOpenTip(true)} className="border-2 ml-3 border-gray-600 text-2xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
+              Tip Farm
+            </button>
           </div>
           <Transition.Root show={open} as={Fragment}>
             <Dialog as="div" className="relative z-10" onClose={setOpen}>
@@ -149,24 +152,25 @@ function App(): JSX.Element {
 
                         <div className=" text-center ">
                           <Dialog.Title as="h3" className="text-5xl font-farmerr  font-semibold  text-gray-900">
-                            WE HEAR THERE'S SOME GRAIN OUT UNISWAP WAY
+                            THERE'S $CROPS TRADING OUT UNISWAP WAY
                           </Dialog.Title>
                           <div className="mt-4 text-center">
-                            <p className='text-2xl font-farmerr'>Theres a network of farmers transacting their GRAIN reserves on-chain, take your tractor out there and see what you can find.</p>
+                            <p className='text-2xl font-farmerr'>We've heard that there are a network of farmers swapping their CROPS on-chain, take your tractor and see what you can negotiate.</p>
                             {account && state.status && <span >
-                              {/* {renderTransactionState()} */}
+                       
                             </span>}
                           </div>
                         </div>
                       </div>
 
                       <div className="mt-4 sm:mt-6 grid grid-cols-3 font-farmerr justify-evenly flex align-middle">
-                        <a href='https://app.uniswap.org/swap?outputCurrency=0x37fD2243004Ea585E5dA47318b1A1f2F5f12BcF9&inputCurrency=ETH' target='_blank' className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 text-center ">
+                        {harvest && <> <a href={`https://app.uniswap.org/swap?outputCurrency=${harvest.cropContract}}&inputCurrency=ETH`} target='_blank' className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 text-center ">
                           Uniswap
                         </a>
-                        <a href='https://dexscreener.com/ethereum/0xed417e91c8ed9f0f304d7f871732ca47c3d77ead' target='_blank' className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 text-center ">
-                          Chart
-                        </a>
+                          <a href={`https://dexscreener.com/ethereum/${harvest.cropLiquidityPool}`} target='_blank' className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 text-center ">
+                            Chart
+                          </a></>}
+
                         <button onClick={() => {
                           setOpen(false)
                         }} className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 text-center ">
@@ -183,6 +187,75 @@ function App(): JSX.Element {
             </Dialog>
           </Transition.Root>
 
+          <Transition.Root show={openTip} as={Fragment}>
+            <Dialog as="div" className="relative z-10" onClose={setOpenTip}>
+              <Transition.Child
+                as={Fragment}
+                enter="ease-out duration-300"
+                enterFrom="opacity-0"
+                enterTo="opacity-100"
+                leave="ease-in duration-200"
+                leaveFrom="opacity-100"
+                leaveTo="opacity-0"
+              >
+                <div className="fixed inset-0  transition-opacity" />
+              </Transition.Child>
+
+              <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+                <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                  <Transition.Child
+                    as={Fragment}
+                    enter="ease-out duration-300"
+                    enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                    enterTo="opacity-100 translate-y-0 sm:scale-100"
+                    leave="ease-in duration-200"
+                    leaveFrom="opacity-100 translate-y-0 sm:scale-100"
+                    leaveTo="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
+                  >
+                    <Dialog.Panel className="relative transform overflow-hidden rounded-sm bg-theme-4 px-4 pb-4 pt-5 text-left shadow-xl border-2 border-gray-600 transition-all sm:my-8 sm:w-full sm:max-w-sm sm:p-6">
+                      <div>
+
+                        <div className=" text-center ">
+                          <Dialog.Title as="h3" className="text-5xl font-farmerr  font-semibold  text-gray-900">
+                            Thanks for the tip, partner.
+                          </Dialog.Title>
+                          <div className="mt-4 text-center">
+                            <p className='text-2xl font-farmerr'>Everything goes to helping construct new buildings on the farmyard and researching new ways to uncover rarer, higher yielding crops.</p>
+                            {account && state.status && <span >
+                              {renderTransactionState()}
+                            </span>}
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="mt-4 sm:mt-6 grid grid-cols-3 font-farmerr">
+                        <button onClick={() => handleDonate('0.05')} className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
+                          0.01 ETH
+                        </button>
+                        <button onClick={() => handleDonate('0.10')} className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
+                          0.05 ETH
+                        </button>
+                        <button onClick={() => handleDonate('0.10')} className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
+                          0.10 ETH
+                        </button>
+                      </div>
+
+                      <div className="mt-4 sm:mt-4 grid grid-cols-3 font-farmerr">
+                        <div></div>
+                        <button onClick={() => {
+                          setOpenTip(false)
+                        }} className="border-2  border-gray-600 text-3xl w-full px-2 rounded-sm bg-theme-1 hover:bg-theme-3 justify-center text-center inline-flex mx-auto">
+                          Close
+                        </button>
+                        <div></div>
+                      </div>
+
+                    </Dialog.Panel>
+                  </Transition.Child>
+                </div>
+              </div>
+            </Dialog>
+          </Transition.Root>
         </div>
       </>
 
