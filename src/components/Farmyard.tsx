@@ -44,8 +44,8 @@ const Farmyard = ({ harvest }: FarmyardProps) => {
   const [selectedFilter, setSelectedFilter] = useState<string>('All Farms');
   const balance = useTokenBalance("0x62012018d70A7389F329aBc2FE776c4a70E433Af", account, { chainId: 1 })
 
-  const grainBalance = balance && displayFromWei(balance, 2, 18) || "0";
-  const enoughCrops = harvest && parseFloat(grainBalance) >= harvest.minimumCrops
+  const cropBalance = balance && displayFromWei(balance, 2, 18) || "0";
+  const enoughCrops = harvest && parseFloat(cropBalance) >= harvest.minimumCrops
 
   useEffect(() => {
     if (!account) return;
