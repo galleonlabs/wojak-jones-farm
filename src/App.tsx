@@ -19,7 +19,7 @@ function App(): JSX.Element {
   useEffect(() => {
     if (!account) return;
     fetchConfig();
-    checkPendingTransaction();
+    // checkPendingTransaction();
   }, [account, library]);
 
   const fetchConfig = async () => {
@@ -30,71 +30,71 @@ function App(): JSX.Element {
     }
   };
 
-  const checkPendingTransaction = () => {
-    const storedTxHash = localStorage.getItem('pendingTransactionHash');
-    if (!storedTxHash || !library) return;
+  // const checkPendingTransaction = () => {
+  //   const storedTxHash = localStorage.getItem('pendingTransactionHash');
+  //   if (!storedTxHash || !library) return;
 
-    library.getTransactionReceipt(storedTxHash).then(receipt => {
-      if (receipt && receipt.confirmations) {
-        updateAccountPaidStatus(storedTxHash);
-      }
-      localStorage.removeItem('pendingTransactionHash');
-    });
-  };
+  //   library.getTransactionReceipt(storedTxHash).then(receipt => {
+  //     if (receipt && receipt.confirmations) {
+  //       updateAccountPaidStatus(storedTxHash);
+  //     }
+  //     localStorage.removeItem('pendingTransactionHash');
+  //   });
+  // };
 
   useEffect(() => {
-    if (account && state.status === 'Success') {
-      updateAccountPaidStatus(state.transaction?.hash);
-    }
+    // if (account && state.status === 'Success') {
+    //   updateAccountPaidStatus(state.transaction?.hash);
+    // }
   }, [state, account]);
 
-  const updateAccountPaidStatus = (transactionHash?: string) => {
-    if (!transactionHash || !account) return
-    const accountRef = doc(db, "accounts", account.toLowerCase());
-    setDoc(accountRef, { account: account.toLowerCase(), paid: true, transactionHash }, { merge: true });
-  };
+  // const updateAccountPaidStatus = (transactionHash?: string) => {
+  //   if (!transactionHash || !account) return
+  //   const accountRef = doc(db, "accounts", account.toLowerCase());
+  //   setDoc(accountRef, { account: account.toLowerCase(), paid: true, transactionHash }, { merge: true });
+  // };
 
-  const isAllowedNetwork = () => ALLOWED_NETWORKS.includes(chainId || 1);
+  // const isAllowedNetwork = () => ALLOWED_NETWORKS.includes(chainId || 1);
 
-  const handleDonate = (amount: string) => {
-    if (!account || !isAllowedNetwork()) return;
+  // const handleDonate = (amount: string) => {
+  //   if (!account || !isAllowedNetwork()) return;
 
-    sendTransaction({ to: BLOCKCROP_FARM_ADDRESS, value: ethers.utils.parseEther(amount) })
-      .then((txResponse) => {
-        localStorage.setItem('pendingTransactionHash', txResponse?.transactionHash || '');
-      })
-      .catch(console.error);
-  };
+  //   sendTransaction({ to: BLOCKCROP_FARM_ADDRESS, value: ethers.utils.parseEther(amount) })
+  //     .then((txResponse) => {
+  //       localStorage.setItem('pendingTransactionHash', txResponse?.transactionHash || '');
+  //     })
+  //     .catch(console.error);
+  // };
 
-  const getBlockExplorerUrl = (txHash: string = '', chainId: number = 1): string => {
-    switch (chainId) {
-      case Optimism.chainId:
-        return Optimism.getExplorerTransactionLink(txHash);
-      case Polygon.chainId:
-        return Polygon.getExplorerTransactionLink(txHash);
-      case Arbitrum.chainId:
-        return Arbitrum.getExplorerTransactionLink(txHash);
-      default:
-        return Mainnet.getExplorerTransactionLink(txHash);
-    }
-  }
+  // const getBlockExplorerUrl = (txHash: string = '', chainId: number = 1): string => {
+  //   switch (chainId) {
+  //     case Optimism.chainId:
+  //       return Optimism.getExplorerTransactionLink(txHash);
+  //     case Polygon.chainId:
+  //       return Polygon.getExplorerTransactionLink(txHash);
+  //     case Arbitrum.chainId:
+  //       return Arbitrum.getExplorerTransactionLink(txHash);
+  //     default:
+  //       return Mainnet.getExplorerTransactionLink(txHash);
+  //   }
+  // }
 
-  const renderTransactionState = () => {
-    switch (state.status) {
-      case 'None':
-        return <div className="font-farmerr text-2xl text-center"></div>
-      case 'PendingSignature':
-        return <div className="font-farmerr  animate animate-pulse text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Awaiting Signature...</div>;
-      case 'Mining':
-        return <div className="font-farmerr  animate animate-pulse text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Transaction being processed.<br></br><a target='_blank' href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>View Explorer</a></div>;
-      case 'Success':
-        return <div className="font-farmerr  text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Well look at that, transaction successful!<br></br><a target='_blank' href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>View Explorer</a></div>;
-      case 'Fail':
-        return <div className="font-farmerr  text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Ah sorry, partner - the transaction failed.<br></br><a target='_blank' href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>View Explorer</a></div>;
-      default:
-        return <div className="font-farmerr   text-2xl text-center"></div>;
-    }
-  };
+  // const renderTransactionState = () => {
+  //   switch (state.status) {
+  //     case 'None':
+  //       return <div className="font-farmerr text-2xl text-center"></div>
+  //     case 'PendingSignature':
+  //       return <div className="font-farmerr  animate animate-pulse text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Awaiting Signature...</div>;
+  //     case 'Mining':
+  //       return <div className="font-farmerr  animate animate-pulse text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Transaction being processed.<br></br><a target='_blank' href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>View Explorer</a></div>;
+  //     case 'Success':
+  //       return <div className="font-farmerr  text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Well look at that, transaction successful!<br></br><a target='_blank' href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>View Explorer</a></div>;
+  //     case 'Fail':
+  //       return <div className="font-farmerr  text-2xl text-center py-2 my-2 border-y border-gray-600 bg-theme-3">Ah sorry, partner - the transaction failed.<br></br><a target='_blank' href={getBlockExplorerUrl(state?.transaction?.hash, chainId)}>View Explorer</a></div>;
+  //     default:
+  //       return <div className="font-farmerr   text-2xl text-center"></div>;
+  //   }
+  // };
 
   return (
     <div className='mx-auto max-w-4xl  min-h-full mb-32 text-gray-900 border-2 border-gray-600 rounded-sm mt-16 justify-center '>
@@ -108,11 +108,11 @@ function App(): JSX.Element {
           {account && harvest && <p className='text-2xl text-center pb-2'>We're currently on harvest {harvest?.harvest}, and if you care to stay<br></br> we will be sending the combine harvester out on {harvest?.nextHarvest.toDate().toDateString()}</p>}
           <div className='justify-center mx-auto text-center'>
             <ConnectButton />
-            {account && (
-              <button onClick={() => setOpen(true)} className="border-2 ml-3 border-gray-600 text-2xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
-                Donate
-              </button>
-            )}
+
+            <button onClick={() => setOpen(true)} className="border-2 ml-3 border-gray-600 text-2xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
+              GRAIN
+            </button>
+
 
             <a href='https://t.me/+RhoECTs_tRFjNzhk' target='_blank' onClick={() => setOpen(true)} className="border-2 ml-3 border-gray-600 text-2xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
               Telegram
@@ -149,38 +149,32 @@ function App(): JSX.Element {
 
                         <div className=" text-center ">
                           <Dialog.Title as="h3" className="text-5xl font-farmerr  font-semibold  text-gray-900">
-                            How much you donating, partner?
+                            WE HEAR THERE'S SOME GRAIN OUT UNISWAP WAY
                           </Dialog.Title>
                           <div className="mt-4 text-center">
-                            <p className='text-2xl font-farmerr'>Your one-time donation makes you a permanent friend of the farm and you'll always be able to see our crops. Your access will update automatically on transaction confirmation.</p>
+                            <p className='text-2xl font-farmerr'>Theres a network of farmers transacting their GRAIN reserves on-chain, take your tractor out there and see what you can find.</p>
                             {account && state.status && <span >
-                              {renderTransactionState()}
+                              {/* {renderTransactionState()} */}
                             </span>}
                           </div>
                         </div>
                       </div>
 
-                      <div className="mt-4 sm:mt-6 grid grid-cols-3 font-farmerr">
-                        <button onClick={() => handleDonate('0.01')} className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
-                          0.01 ETH
-                        </button>
-                        <button onClick={() => handleDonate('0.05')} className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
-                          0.05 ETH
-                        </button>
-                        <button onClick={() => handleDonate('0.10')} className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
-                          0.10 ETH
+                      <div className="mt-4 sm:mt-6 grid grid-cols-3 font-farmerr justify-evenly flex align-middle">
+                        <a href='https://app.uniswap.org/swap?outputCurrency=0x37fD2243004Ea585E5dA47318b1A1f2F5f12BcF9&inputCurrency=ETH' target='_blank' className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 text-center ">
+                          Uniswap
+                        </a>
+                        <a href='https://dexscreener.com/ethereum/0xed417e91c8ed9f0f304d7f871732ca47c3d77ead' target='_blank' className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 text-center ">
+                          Chart
+                        </a>
+                        <button onClick={() => {
+                          setOpen(false)
+                        }} className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 text-center ">
+                          Close
                         </button>
                       </div>
 
-                      <div className="mt-4 sm:mt-4 grid grid-cols-3 font-farmerr">
-                        <div></div>
-                        <button onClick={() => {
-                          setOpen(false)
-                        }} className="border-2  border-gray-600 text-3xl w-full px-2 rounded-sm bg-theme-1 hover:bg-theme-3 justify-center text-center inline-flex mx-auto">
-                          Close
-                        </button>
-                        <div></div>
-                      </div>
+
 
                     </Dialog.Panel>
                   </Transition.Child>
@@ -192,7 +186,7 @@ function App(): JSX.Element {
         </div>
       </>
 
-      <Farmyard donationState={state} harvest={harvest}></Farmyard>
+      <Farmyard harvest={harvest}></Farmyard>
 
       <div className="bg-theme-4 border-2 border-theme-5 mx-auto flex justify-evenly  rounded-sm max-w-4xl py-4  pt-4">
 

@@ -1,7 +1,9 @@
-import { TransactionStatus, useEthers } from "@usedapp/core";
+import { TransactionStatus, useEthers, useTokenBalance } from "@usedapp/core";
 import { useEffect, useState } from "react";
 import { DocumentData, collection, doc, getDoc, getDocs, limit, query } from "firebase/firestore";
 import { db } from "../main";
+import { BigNumber } from "ethers";
+import { formatUnits } from "ethers/lib/utils";
 
 interface RewardAsset {
   name: string;
@@ -19,32 +21,34 @@ interface Farm {
 }
 
 interface FarmyardProps {
-  donationState: TransactionStatus;
   harvest: DocumentData | null;
 }
 
-const Farmyard = ({ donationState, harvest }: FarmyardProps) => {
+export const displayFromWei = (
+  number: BigNumber,
+  decimals: number = 0,
+  power: number = 18
+): string | null => {
+  if (!number) return null;
+
+  if (decimals) {
+    return Number(formatUnits(number, power)).toFixed(decimals);
+  }
+
+  return formatUnits(number, power);
+};
+
+const Farmyard = ({ harvest }: FarmyardProps) => {
   const { account } = useEthers();
   const [farms, setFarms] = useState<Farm[]>([]);
-  const [hasPaid, setHasPaid] = useState<boolean>(false);
   const [selectedFilter, setSelectedFilter] = useState<string>('All Farms');
+  const balance = useTokenBalance("0x37fD2243004Ea585E5dA47318b1A1f2F5f12BcF9", account, { chainId: 1 })
+
+  const grainBalance = balance && displayFromWei(balance, 2, 18) || "0";
+  const enoughGrain = parseFloat(grainBalance) >= 100000
 
   useEffect(() => {
     if (!account) return;
-
-    const checkAccountPaidStatus = async () => {
-      const accountRef = doc(db, "accounts", account.toLowerCase());
-      const accountDoc = await getDoc(accountRef);
-
-      if (accountDoc.exists()) {
-        setHasPaid(accountDoc.data().paid);
-        return accountDoc.data().paid;
-      } else {
-        
-        setHasPaid(false);
-        return false;
-      }
-    };
 
     const fetchActiveFarms = async (fetchCount: number = 2) => {
       const farmsQuery = query(collection(db, "activeFarms"), limit(fetchCount));
@@ -57,12 +61,11 @@ const Farmyard = ({ donationState, harvest }: FarmyardProps) => {
     };
 
     const fetchData = async () => {
-      const isPaid = await checkAccountPaidStatus();
-      fetchActiveFarms(isPaid ? 100 : 2);
+      fetchActiveFarms(enoughGrain ? 100 : 2);
     };
 
     fetchData();
-  }, [account, donationState]);
+  }, [account, enoughGrain]);
 
   const handleFilterChange = (filter: string) => {
     setSelectedFilter(filter);
@@ -72,16 +75,17 @@ const Farmyard = ({ donationState, harvest }: FarmyardProps) => {
     return selectedFilter === 'All Farms' || farm.type === selectedFilter.toUpperCase();
   });
 
+
   return (
     <>
       <div className="mx-auto bg-theme-4 border-2 border-theme-5  rounded-sm max-w-4xl py-8 tracking-wider bg-[url('Frame.png')] bg-contain bg-repeat bg-top">
         <img src='./farm.png' alt='logo' className='h-16 w-16 justify-center text-center mx-auto'></img>
         <h1 className="text-5xl font-bold text-theme-pan-navy mb-2 text-center pt-4">Crop Fields</h1>
         {account && harvest && <p className='text-2xl text-center pb-2'>{harvest?.season} Harvest</p>}
-        {account && !hasPaid && <div className="text-2xl text-center mx-auto border-gray-900 bg-theme-3 py-4 border-y mb-2">Consider a one-time donation to the farmstead to see more than two crops, friend.</div>}
+        {account && !enoughGrain && <div className="text-2xl text-center mx-auto border-gray-900 bg-theme-3 py-4 border-y mb-2">Labourers with 100,000 GRAIN in their baskets can see more crops.</div>}
+        
 
-  
-        {account && hasPaid && <div className="text-center mb-2">
+        {account && enoughGrain && <div className="text-center mb-2">
           {['All Farms', 'Stable', 'Volatile', 'Staking', 'Airdrop'].map(filter => (
             <button
               key={filter}
@@ -92,7 +96,7 @@ const Farmyard = ({ donationState, harvest }: FarmyardProps) => {
             </button>
           ))}
         </div>}
-        
+
         <ul role="list" className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-2 mx-8 pt-4">
           {account && filteredFarms.map((farm: Farm, index: number) => (
             <li key={index} className="col-span-1 divide divide-theme-5 rounded-sm bg-theme-4 border-2 border-theme-5 shadow shadow-theme-5 ">
@@ -137,7 +141,7 @@ const Farmyard = ({ donationState, harvest }: FarmyardProps) => {
               </div>
             </li>
           ))}
-          {(!hasPaid || !account) && <>
+          {(!enoughGrain || !account) && <>
             {[<></>, <></>, <></>, <></>].fill(<div className=" blur col-span-1 divide divide-theme-5 rounded-sm bg-theme-4 border-2 border-theme-5 shadow shadow-theme-5 ">
               <div className="flex w-full items-center justify-between space-x-6 p-4">
                 <div className="flex-1 text-xl">
