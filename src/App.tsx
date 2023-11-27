@@ -20,8 +20,13 @@ function App(): JSX.Element {
   useEffect(() => {
     if (!account) return;
     fetchConfig();
-     checkPendingTransaction();
+    checkPendingTransaction();
   }, [account, library]);
+
+  useEffect(() => {
+    fetchConfig();
+  }, []);
+
 
   const fetchConfig = async () => {
     const configRef = doc(db, "config", 'website');
@@ -115,7 +120,7 @@ function App(): JSX.Element {
             </button>
 
 
-            <a href='https://t.me/+aXlXXyqTFEViNDU0' target='_blank' onClick={() => setOpen(true)} className="border-2 ml-3 border-gray-600 text-2xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
+            <a href='https://t.me/wojakjonesfarm' target='_blank' onClick={() => setOpen(true)} className="border-2 ml-3 border-gray-600 text-2xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
               Telegram
             </a>
             <button onClick={() => setOpenTip(true)} className="border-2 ml-3 border-gray-600 text-2xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
@@ -157,7 +162,7 @@ function App(): JSX.Element {
                           <div className="mt-4 text-center">
                             <p className='text-2xl font-farmerr'>We've heard that there are a network of farmers swapping their CROPS on-chain, take your tractor and see what you can negotiate.</p>
                             {account && state.status && <span >
-                       
+
                             </span>}
                           </div>
                         </div>
@@ -177,8 +182,6 @@ function App(): JSX.Element {
                           Close
                         </button>
                       </div>
-
-
 
                     </Dialog.Panel>
                   </Transition.Child>
