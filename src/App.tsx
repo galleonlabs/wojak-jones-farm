@@ -172,7 +172,7 @@ function App(): JSX.Element {
                         {harvest && <> <a href={`https://app.uniswap.org/swap?outputCurrency=${harvest.cropContract}&inputCurrency=ETH`} target='_blank' className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 text-center ">
                           Uniswap
                         </a>
-                          <a href={`https://dexscreener.com/ethereum/${harvest.cropLiquidityPool}`} target='_blank' className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 text-center ">
+                          <a href={`https://www.geckoterminal.com/eth/pools/${harvest.cropLiquidityPool}`} target='_blank' className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 text-center ">
                             Chart
                           </a></>}
 
