@@ -1,4 +1,4 @@
-import {  useEthers, useTokenBalance } from "@usedapp/core";
+import { useEthers, useTokenBalance } from "@usedapp/core";
 import { useEffect, useState } from "react";
 import { DocumentData, collection, getDocs, limit, query } from "firebase/firestore";
 import { db } from "../main";
@@ -82,8 +82,8 @@ const Farmyard = ({ harvest }: FarmyardProps) => {
         <img src='./farm.png' alt='logo' className='h-16 w-16 justify-center text-center mx-auto'></img>
         <h1 className="text-5xl font-bold text-theme-pan-navy mb-2 text-center pt-4">Crop Fields</h1>
         {account && harvest && <p className='text-2xl text-center pb-2'>{harvest?.season} Harvest</p>}
-        {account && !enoughCrops && <div className="text-2xl text-center mx-auto border-gray-900 bg-theme-3 py-4 border-y mb-2">Labourers with at least 10,000 $CROPS get access to the full farmyard.</div>}
-        
+        {account && !enoughCrops && <div className="text-2xl text-center mx-auto border-gray-900 bg-theme-3 py-4 border-y mb-2">Labourers with at least {harvest?.minimumCrops} $CROPS get access to the full farmyard.</div>}
+
 
         {account && enoughCrops && <div className="text-center mb-2">
           {['All Farms', 'Stable', 'Volatile', 'Staking', 'Airdrop'].map(filter => (
