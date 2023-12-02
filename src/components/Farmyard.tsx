@@ -78,7 +78,7 @@ const Farmyard = ({ harvest }: FarmyardProps) => {
 
   return (
     <>
-      <div className="mx-auto bg-theme-4 border-2 border-theme-5  rounded-sm max-w-4xl py-8 tracking-wider bg-[url('Frame.png')] bg-contain bg-repeat bg-top">
+      <div className="mx-auto bg-theme-4  border-2 border-gray-600  rounded-sm max-w-4xl py-8 tracking-wider bg-[url('Frame.png')] bg-contain bg-repeat bg-top">
         <img src='./farm.png' alt='logo' className='h-16 w-16 justify-center text-center mx-auto'></img>
         <h1 className="text-5xl font-bold text-theme-pan-navy mb-2 text-center pt-4">Crop Fields</h1>
         {account && harvest && <p className='text-2xl text-center pb-2'>{harvest?.season} Harvest</p>}

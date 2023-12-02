@@ -17,6 +17,7 @@ function App(): JSX.Element {
   const { state, sendTransaction } = useSendTransaction();
   const [open, setOpen] = useState<boolean>(false);
   const [openTip, setOpenTip] = useState<boolean>(false);
+  const [currentPage, setCurrentPage] = useState<'Crop Fields' | 'Harvest'>('Crop Fields');
 
   useEffect(() => {
     if (!account) return;
@@ -104,16 +105,16 @@ function App(): JSX.Element {
   };
 
   return (
-    <div className='mx-auto max-w-4xl  min-h-full mb-32 text-gray-900 border-2 border-gray-600 rounded-sm mt-16 justify-center '>
+    <div className='mx-auto max-w-4xl  min-h-full mb-32 text-gray-900  rounded-sm mt-16  justify-center '>
       <>
-        <div className="bg-theme-4 border-2 border-theme-5 justify-center mx-auto pb-6  rounded-sm max-w-4xl py-4  pt-8">
+        <div className="bg-theme-4 border-2 border-gray-600 justify-center mx-auto pb-10   rounded-sm max-w-4xl py-4  pt-8">
           <h1 className="text-7xl font-bold mb-2 pt-4 text-center ">Wojak Jones Farm</h1>
           <img src='./field.png' alt='logo' className='h-16 w-16 justify-center text-center mx-auto'></img>
           <h1 className="text-5xl font-bold mb-2 pt-4 text-center ">Front Gate</h1>
           <p className='text-2xl text-center'>Welcome {account && 'back'} to Wojak Jones Farm, partner.</p>
           {!account && <p className='text-2xl text-center pb-2'>Connect your wallet to view our crops.</p>}
           {account && harvest && <p className='text-2xl text-center pb-2'>We're currently on harvest {harvest?.harvest}, and if you care to stay<br></br> we will be sending the combine harvester out on {harvest?.nextHarvest.toDate().toDateString()}</p>}
-          <div className='justify-center mx-auto text-center'>
+          <div className='justify-center mx-auto text-center pt-2'>
             <ConnectButton />
 
             <button onClick={() => setOpen(true)} className="border-2 ml-3 border-gray-600 text-2xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 justify-center text-center inline-flex mx-auto">
@@ -128,6 +129,7 @@ function App(): JSX.Element {
               Tip Farm
             </button>
           </div>
+          
           <Transition.Root show={open} as={Fragment}>
             <Dialog as="div" className="relative z-10" onClose={setOpen}>
               <Transition.Child
@@ -182,7 +184,10 @@ function App(): JSX.Element {
                         }} className="border-2 ml-3 border-gray-600 text-3xl px-2 rounded-sm bg-theme-3 hover:bg-theme-1 text-center ">
                           Close
                         </button>
+
+
                       </div>
+
 
                     </Dialog.Panel>
                   </Transition.Child>
@@ -263,9 +268,31 @@ function App(): JSX.Element {
         </div>
       </>
 
-      <Farmyard harvest={harvest}></Farmyard>
-      <Harvest harvest={harvest}></Harvest>
-      <div className="bg-theme-4 border-2 border-theme-5 mx-auto flex justify-evenly  rounded-sm max-w-4xl py-4  pt-4">
+
+      <div className='justify-center mx-auto text-center border-t-2 border-x-2 border-gray-600 mt-6 bg-theme-5 '>
+       
+        <button
+          onClick={() => setCurrentPage('Crop Fields')}
+          className={`mt-4 mb-4 border-2 border-gray-600 mr-3 text-2xl px-2 rounded-sm ${currentPage === 'Crop Fields' ? 'bg-theme-4' : 'bg-theme-1'} hover:bg-theme-4 justify-center text-center inline-flex mx-auto`}
+        >
+          Crop Fields
+        </button>
+        <button
+          onClick={() => setCurrentPage('Harvest')}
+          className={`mt-4 mb-4 border-2 border-gray-600 text-2xl px-2 rounded-sm ${currentPage === 'Harvest' ? 'bg-theme-4' : 'bg-theme-1'} hover:bg-theme-4 justify-center text-center inline-flex mx-auto`}
+        >
+          Harvests
+        </button>
+      </div>
+      <>
+        {currentPage === 'Crop Fields' ? (
+          <Farmyard harvest={harvest}></Farmyard>
+        ) : (
+          <Harvest harvest={harvest}></Harvest>
+        )}
+
+      </>
+      <div className="bg-theme-4 border-b-2 border-x-2 border-gray-600 mx-auto flex justify-evenly  rounded-b-sm max-w-4xl py-4  pt-4">
 
 
         <a target='_blank' href='https://twitter.com/galleonlabs' className='text-2xl text-center inline-flex border-b hover:border-b-gray-600 border-transparent'>Twitter</a>

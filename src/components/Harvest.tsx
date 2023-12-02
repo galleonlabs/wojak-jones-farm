@@ -45,18 +45,18 @@ const Harvest = ({ harvest }: HarvestProps) => {
   return (
     <>
       {account && enoughCrops ? (
-        <div className="mx-auto bg-theme-4 border-2 border-theme-5 rounded-sm max-w-4xl py-8 tracking-wider">
+        <div className="mx-auto bg-theme-4 border-2 border-gray-600 rounded-sm max-w-4xl py-8 tracking-wider">
           <img src='./barn.png' alt='logo' className='h-16 w-16 justify-center text-center mx-auto'></img>
           <h1 className="text-5xl font-bold text-theme-pan-navy mb-2 text-center pt-4">Harvests</h1>
           <p className='text-2xl text-center pb-2'>See here what crops we've previously grown and yielded from the farm.</p>
           <ul>
             {completedHarvests.map((harvest, index) => (
-              <li key={index} className="my-2 px-8 pb-2 pt-4 border-b-2 border-theme-5 bg-theme-1 shadow shadow-theme-5">
+              <li key={index} className="my-2 px-8 mx-8 rounded-sm pb-2 pt-4 border-2 mb-4 border-theme-2 bg-theme-5 shadow-sm shadow-theme-5">
                 <h2 className="text-2xl font-bold">{`Harvest #${harvest.harvest} (${harvest.season})`}</h2>
                 <div className="flex flex-wrap">
                   {harvest.rewardAssets.map((asset, idx) => (
                     <div key={idx} className="flex items-center my-2 mx-4">
-                      <img src={asset.logo} alt={asset.name} className="w-10 h-10 mr-2 grayscale-[30%] rounded-full border-2 border-gray-600 p-0.5 bg-white" />
+                      <img src={asset.logo} alt={asset.name} className="w-10 h-10 mr-2 grayscale-[40%] rounded-full border-2 border-gray-600 p-0.5 bg-white" />
                       <a href={asset.coinGeckoUrl} target="_blank" rel="noopener noreferrer" className="text-xl hover:underline ">
                         {asset.ticker}
                       </a>
