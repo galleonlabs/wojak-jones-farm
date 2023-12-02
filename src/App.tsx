@@ -9,6 +9,7 @@ import { Fragment } from 'react'
 import { Dialog, Transition } from '@headlessui/react'
 import { ALLOWED_NETWORKS, WOJAK_JONES_FARM_ADDRESS } from './constants';
 import { ethers } from 'ethers';
+import Harvest from './components/Harvest';
 
 function App(): JSX.Element {
   const { account, library, chainId } = useEthers();
@@ -263,7 +264,7 @@ function App(): JSX.Element {
       </>
 
       <Farmyard harvest={harvest}></Farmyard>
-
+      <Harvest harvest={harvest}></Harvest>
       <div className="bg-theme-4 border-2 border-theme-5 mx-auto flex justify-evenly  rounded-sm max-w-4xl py-4  pt-4">
 
 
@@ -271,7 +272,6 @@ function App(): JSX.Element {
         <a target='_blank' href='https://twitter.com/andrew_eth' className='text-2xl text-center inline-flex border-b hover:border-b-gray-600 border-transparent'>Head Farmer</a>
         <a target='_blank' href='https://galleonlabs.io' className='text-2xl text-center inline-flex border-b hover:border-b-gray-600 border-transparent'>Galleon Labs</a>
         <a target='_blank' href='https://github.com/galleonlabs' className='text-2xl text-center inline-flex border-b hover:border-b-gray-600 border-transparent'>GitHub</a>
-
       </div>
     </div>
   )
