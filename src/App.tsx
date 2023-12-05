@@ -17,7 +17,7 @@ function App(): JSX.Element {
   const { state, sendTransaction } = useSendTransaction();
   const [open, setOpen] = useState<boolean>(false);
   const [openTip, setOpenTip] = useState<boolean>(false);
-  const [currentPage, setCurrentPage] = useState<'Crop Fields' | 'Harvest'>('Crop Fields');
+  const [currentPage, setCurrentPage] = useState<'Crop Fields' | 'Harvest' | 'Storage'>('Crop Fields');
 
   useEffect(() => {
     if (!account) return;
@@ -129,7 +129,7 @@ function App(): JSX.Element {
               Tip Farm
             </button>
           </div>
-          
+
           <Transition.Root show={open} as={Fragment}>
             <Dialog as="div" className="relative z-10" onClose={setOpen}>
               <Transition.Child
@@ -270,12 +270,18 @@ function App(): JSX.Element {
 
 
       <div className='justify-center mx-auto text-center border-t-2 border-x-2 border-gray-600 mt-6 bg-theme-5 '>
-       
+
         <button
           onClick={() => setCurrentPage('Crop Fields')}
           className={`mt-4 mb-4 border-2 border-gray-600 mr-3 text-2xl px-2 rounded-sm ${currentPage === 'Crop Fields' ? 'bg-theme-4' : 'bg-theme-1'} hover:bg-theme-4 justify-center text-center inline-flex mx-auto`}
         >
           Crop Fields
+        </button>
+        <button
+          onClick={() => setCurrentPage('Storage')}
+          className={`mt-4 mb-4 border-2 border-gray-600 mr-3 text-2xl px-2 rounded-sm ${currentPage === 'Storage' ? 'bg-theme-4' : 'bg-theme-1'} hover:bg-theme-4 justify-center text-center inline-flex mx-auto`}
+        >
+          Storage
         </button>
         <button
           onClick={() => setCurrentPage('Harvest')}
@@ -286,8 +292,9 @@ function App(): JSX.Element {
       </div>
       <>
         {currentPage === 'Crop Fields' ? (
-          <Farmyard harvest={harvest}></Farmyard>
-        ) : (
+          <Farmyard harvest={harvest} dbCollection='activeFarms'></Farmyard>
+        ) : currentPage === 'Storage' ? (
+          <Farmyard harvest={harvest} dbCollection='archivedFarms'></Farmyard>) : (
           <Harvest harvest={harvest}></Harvest>
         )}
 

@@ -22,6 +22,7 @@ interface Farm {
 
 interface FarmyardProps {
   harvest: DocumentData | null;
+  dbCollection: string
 }
 
 export const displayFromWei = (
@@ -38,7 +39,7 @@ export const displayFromWei = (
   return formatUnits(number, power);
 };
 
-const Farmyard = ({ harvest }: FarmyardProps) => {
+const Farmyard = ({ harvest, dbCollection }: FarmyardProps) => {
   const { account } = useEthers();
   const [farms, setFarms] = useState<Farm[]>([]);
   const [selectedFilter, setSelectedFilter] = useState<string>('All Farms');
@@ -51,7 +52,7 @@ const Farmyard = ({ harvest }: FarmyardProps) => {
     if (!account) return;
 
     const fetchActiveFarms = async (fetchCount: number = 2) => {
-      const farmsQuery = query(collection(db, "activeFarms"), limit(fetchCount));
+      const farmsQuery = query(collection(db, dbCollection), limit(fetchCount));
       const querySnapshot = await getDocs(farmsQuery);
       const fetchedFarms: Farm[] = [];
       querySnapshot.forEach((doc: DocumentData) => {
@@ -65,7 +66,7 @@ const Farmyard = ({ harvest }: FarmyardProps) => {
     };
 
     fetchData();
-  }, [account, enoughCrops]);
+  }, [account, enoughCrops, dbCollection]);
 
   const handleFilterChange = (filter: string) => {
     setSelectedFilter(filter);
@@ -80,8 +81,9 @@ const Farmyard = ({ harvest }: FarmyardProps) => {
     <>
       <div className="mx-auto bg-theme-4  border-2 border-gray-600  rounded-sm max-w-4xl py-8 tracking-wider bg-[url('Frame.png')] bg-contain bg-repeat bg-top">
         <img src='./farm.png' alt='logo' className='h-16 w-16 justify-center text-center mx-auto'></img>
-        <h1 className="text-5xl font-bold text-theme-pan-navy mb-2 text-center pt-4">Crop Fields</h1>
-        {account && harvest && <p className='text-2xl text-center pb-2'>{harvest?.season} Harvest</p>}
+        <h1 className="text-5xl font-bold text-theme-pan-navy mb-2 text-center pt-4">{dbCollection === 'activeFarms' ? 'Crop Fields' : 'Storage'}</h1>
+        {account && harvest && dbCollection === 'archivedFarms' && <p className='text-2xl text-center pb-2'>Historic crops on the farm, we still keep a few seeds around.</p>}
+        {account && harvest && dbCollection === 'activeFarms' && <p className='text-2xl text-center pb-2'>{harvest?.season} Harvest</p>}
         {account && !enoughCrops && <div className="text-2xl text-center mx-auto border-gray-900 bg-theme-3 py-4 border-y mb-2">Labourers with at least {harvest?.minimumCrops} $CROPS get access to the full farmyard.</div>}
 
 
