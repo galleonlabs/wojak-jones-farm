@@ -113,7 +113,7 @@ function App(): JSX.Element {
           <h1 className="text-5xl font-bold mb-2 pt-4 text-center ">Front Gate</h1>
           <p className='text-2xl text-center'>Welcome {account && 'back'} to Wojak Jones Farm, partner.</p>
           {!account && <p className='text-2xl text-center pb-2'>Connect your wallet to view our crops.</p>}
-          {account && harvest && <p className='text-2xl text-center pb-2'>We're currently on harvest {harvest?.harvest}, and if you care to stay<br></br> we will be sending the combine harvester out on {harvest?.nextHarvest.toDate().toDateString()}</p>}
+          {account && harvest && <p className='text-2xl text-center pb-2'>We're currently on harvest {harvest?.harvest} {harvest.pause ? <>within a research and planting period.<br></br>Feel free to browse our historic storage.</> : <>, and if you care to stay<br></br> we will be sending the combine harvester out on {harvest?.nextHarvest.toDate().toDateString()}</>}</p>}
           <div className='justify-center mx-auto text-center pt-2'>
             <ConnectButton />
 
