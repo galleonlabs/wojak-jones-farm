@@ -83,7 +83,7 @@ const Farmyard = ({ harvest, dbCollection }: FarmyardProps) => {
         <img src='./farm.png' alt='logo' className='h-16 w-16 justify-center text-center mx-auto'></img>
         <h1 className="text-5xl font-bold text-theme-pan-navy mb-2 text-center pt-4">{dbCollection === 'activeFarms' ? 'Crop Fields' : 'Storage'}</h1>
         {account && harvest && dbCollection === 'archivedFarms' && <p className='text-2xl text-center pb-2'>Historic crops on the farm, we still keep a few seeds around.</p>}
-        {account && harvest && dbCollection === 'activeFarms' && <p className='text-2xl text-center pb-2'>{harvest?.season} Harvest</p>}
+        {account && harvest && dbCollection === 'activeFarms' && <p className='text-2xl text-center pb-2'>Our current {harvest?.season} harvest</p>}
         {account && !enoughCrops && <div className="text-2xl text-center mx-auto border-gray-900 bg-theme-3 py-4 border-y mb-2">Labourers with at least {harvest?.minimumCrops} $CROPS get access to the full farmyard.</div>}
 
 
